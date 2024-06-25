@@ -33,5 +33,17 @@ namespace MetricsManagerTests
 
 
         }
+        [Fact]
+        public void GetMetricsFromAllCluster_ReturnOk()
+        {
+            TimeSpan fromTime = TimeSpan.FromSeconds(0);
+            TimeSpan toTime = TimeSpan.FromSeconds(100);
+
+            IActionResult result = _cpuMetricsController.GetMetricsFromAllCluster( fromTime, toTime);
+
+            Assert.IsAssignableFrom<IActionResult>(result);
+
+
+        }
     }
 }

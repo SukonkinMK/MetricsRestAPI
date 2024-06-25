@@ -1,6 +1,6 @@
 ﻿namespace MetricsManager.Models
 {
-    public class AgentPool
+    public class AgentPool : IAgentPool<AgentInfo>
     {
         private Dictionary<int, AgentInfo> _values;
 

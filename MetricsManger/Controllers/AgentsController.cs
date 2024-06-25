@@ -7,9 +7,9 @@ namespace MetricsManager.Controllers
     [ApiController]
     public class AgentsController : ControllerBase
     {
-        private AgentPool _agentPool;
+        private IAgentPool<AgentInfo> _agentPool;
 
-        public AgentsController(AgentPool agentPool)
+        public AgentsController(IAgentPool<AgentInfo> agentPool)
         {
             _agentPool = agentPool;
         }
@@ -41,15 +41,11 @@ namespace MetricsManager.Controllers
             return Ok();
         }
 
-        // TODO: Домашнее задание [Пункт 1]
-        // Добавьте метод в контроллер агентов проекта, относящегося к менеджеру метрик, который
-        // позволяет получить список зарегистрированных в системе объектов.
         [HttpGet("get")]
         public IActionResult GetAllAgents()
         {
             return Ok(_agentPool.Get());
         }
-
 
     }
 }

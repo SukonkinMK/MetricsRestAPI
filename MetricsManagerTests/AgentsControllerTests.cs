@@ -1,6 +1,8 @@
 ﻿using MetricsManager.Controllers;
 using MetricsManager.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,14 +16,16 @@ namespace MetricsManagerTests
     [Order(1)]
     public class AgentsControllerTests
     {
-        private AgentsController _agentsController;
-        private AgentPool _agentPool;
+        private readonly AgentsController _agentsController;
+        private readonly AgentPool _agentPool;
+        private readonly Mock<ILogger<AgentsController>> loggerMock;
 
 
         public AgentsControllerTests()
         {
             _agentPool = LazyAgentPool.Instance;
-            _agentsController = new AgentsController(_agentPool);
+            loggerMock = new Mock<ILogger<AgentsController>>();
+            _agentsController = new AgentsController(_agentPool, loggerMock.Object);
         }
 
         [Fact, Order(1)]
@@ -43,10 +47,10 @@ namespace MetricsManagerTests
             //result.Value as IEnumerable<AgentInfo>
             Assert.NotNull(result.Value as IEnumerable<AgentInfo>);
             Assert.NotEmpty((IEnumerable<AgentInfo>)result.Value);
-        }        
+        }
 
         [Fact, Order(3)]
-        public void DisableAgentByIdTest() 
+        public void DisableAgentByIdTest()
         {
             int agentId = 1;
             AgentInfo? agentBefore = ((_agentsController.GetAllAgents() as OkObjectResult)?.Value as IEnumerable<AgentInfo>)?.FirstOrDefault(item => item.AgentId == agentId);

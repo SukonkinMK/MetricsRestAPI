@@ -1,5 +1,7 @@
 ﻿using MetricsManager.Controllers;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,14 +12,13 @@ namespace MetricsManagerTests
 {
     public class CpuMetricsManagerTests
     {
-
-
         private CpuMetricsController _cpuMetricsController;
-
+        private readonly Mock<ILogger<CpuMetricsController>> loggerMock;
 
         public CpuMetricsManagerTests()
         {
-            _cpuMetricsController = new CpuMetricsController();
+            loggerMock = new Mock<ILogger<CpuMetricsController>>();
+            _cpuMetricsController = new CpuMetricsController(loggerMock.Object);
         }
 
         [Fact]

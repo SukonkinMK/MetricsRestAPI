@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using MetricsAgent.Services;
+using Microsoft.AspNetCore.Mvc;
 
 namespace MetricsAgent.Controllers
 {
@@ -6,10 +7,22 @@ namespace MetricsAgent.Controllers
     [ApiController]
     public class HddMetricsController : ControllerBase
     {
+        private readonly ILogger<HddMetricsController> _logger;
+        private readonly IHddMetricsRepository _repository;
+
+        public HddMetricsController(ILogger<HddMetricsController> logger, IHddMetricsRepository repository)
+        {
+            _logger = logger;
+            _repository = repository;
+        }
+
         [HttpGet("left/from/{fromTime}/to/{toTime}")]
         public IActionResult GetMetrics([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
         {
-            return Ok();
+            var metric = _repository.GetAll();
+            if (_logger != null)
+                _logger.LogDebug("Успешно вернули HDD метрику: __");
+            return Ok(metric);
         }
     }
 }

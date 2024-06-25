@@ -1,5 +1,9 @@
 ﻿using MetricsAgent.Controllers;
+using MetricsAgent.Models;
+using MetricsAgent.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,12 +15,28 @@ namespace MetricsAgentTests
     public class DotNetMetricsTests
     {
         private readonly DotNetMetricsController _dotNetMetricsController;
-        public DotNetMetricsTests() 
+        private readonly Mock<IDotNetMetricsRepository> repositoryMock;
+        private readonly Mock<ILogger<DotNetMetricsController>> loggerMock;
+        public DotNetMetricsTests()
         {
-            _dotNetMetricsController = new DotNetMetricsController();
+            repositoryMock = new Mock<IDotNetMetricsRepository>();
+            loggerMock = new Mock<ILogger<DotNetMetricsController>>();
+            _dotNetMetricsController = new DotNetMetricsController(loggerMock.Object, repositoryMock.Object);
         }
 
         [Fact]
+        public void Get_ShouldCall_Get_From_Repository()
+        {
+            repositoryMock.Setup(repositoryMock => repositoryMock.GetAll()).Returns(new List<DotNetMetric>() { new DotNetMetric()});
+
+            var result = _dotNetMetricsController.GetErrorsCount(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(10)) as OkObjectResult;
+
+            Assert.NotNull(result.Value);
+            var list = result.Value as List<DotNetMetric>;
+            Assert.Single(list);
+        }
+
+            [Fact]
         public void GetDotNetMetrics_ReturnOk()
         {
             TimeSpan fromTime = TimeSpan.FromSeconds(0);

@@ -28,7 +28,7 @@ namespace MetricsAgentTests
         [Fact]
         public void Get_ShouldCall_Get_From_Repository()
         {
-            repositoryMock.Setup(repositoryMock => repositoryMock.GetAll()).Returns(new List<HddMetric>() { new HddMetric() });
+            repositoryMock.Setup(repositoryMock => repositoryMock.GetByTimePeriod(It.IsAny<TimeSpan>(), It.IsAny<TimeSpan>())).Returns(new List<HddMetric>() { new HddMetric() });
 
             var result = _controller.GetMetrics(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(10)) as OkObjectResult;
 

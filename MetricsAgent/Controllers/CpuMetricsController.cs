@@ -87,7 +87,7 @@ namespace MetricsAgent.Controllers
 
             if (_logger != null)
                 _logger.LogDebug($"Успешно вернули метрику с: {fromTime} по: {toTime}");
-            return Ok();
+            return Ok(_cpuMetricsRepository.GetByTimePeriod(fromTime, toTime));
         }
     }
 }

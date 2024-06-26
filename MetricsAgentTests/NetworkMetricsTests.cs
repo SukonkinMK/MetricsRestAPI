@@ -28,7 +28,7 @@ namespace MetricsAgentTests
         [Fact]
         public void Get_ShouldCall_Get_From_Repository()
         {
-            repositoryMock.Setup(repositoryMock => repositoryMock.GetAll()).Returns(new List<NetworkMetric>() { new NetworkMetric() });
+            repositoryMock.Setup(repositoryMock => repositoryMock.GetByTimePeriod(It.IsAny<TimeSpan>(), It.IsAny<TimeSpan>())).Returns(new List<NetworkMetric>() { new NetworkMetric() });
 
             var result = _controller.GetMetrics(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(10)) as OkObjectResult;
 

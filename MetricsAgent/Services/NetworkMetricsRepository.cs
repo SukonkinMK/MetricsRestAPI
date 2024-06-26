@@ -90,6 +90,30 @@ namespace MetricsAgent.Services
             }
         }
 
+        public IList<NetworkMetric> GetByTimePeriod(TimeSpan fromTime, TimeSpan toTime)
+        {
+            using var connection = new SQLiteConnection(ConnectionString);
+            connection.Open();
+            using var cmd = new SQLiteCommand(connection);
+            cmd.CommandText = "SELECT * FROM networkmetrics WHERE time >= @timeFrom and time <= @timeTo";
+            cmd.Parameters.AddWithValue("@timeFrom", fromTime.TotalSeconds);
+            cmd.Parameters.AddWithValue("@timeTo", toTime.TotalSeconds);
+            var returnList = new List<NetworkMetric>();
+            using (SQLiteDataReader reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    returnList.Add(new NetworkMetric
+                    {
+                        Id = reader.GetInt32(0),
+                        Value = reader.GetInt32(1),
+                        Time = TimeSpan.FromSeconds(reader.GetInt32(2))
+                    });
+                }
+            }
+            return returnList;
+        }
+
         public void Update(NetworkMetric item)
         {
             using var connection = new SQLiteConnection(ConnectionString);

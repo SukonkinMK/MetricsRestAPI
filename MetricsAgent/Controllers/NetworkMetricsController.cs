@@ -19,7 +19,7 @@ namespace MetricsAgent.Controllers
         [HttpGet("from/{fromTime}/to/{toTime}")]
         public IActionResult GetMetrics([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
         {
-            var metrics = _networkMetricsRepository.GetAll();
+            var metrics = _networkMetricsRepository.GetByTimePeriod(fromTime, toTime);
             if (_logger != null)
                 _logger.LogDebug("Успешно вернули Network метрику: __");
             return Ok(metrics);

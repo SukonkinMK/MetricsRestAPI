@@ -19,7 +19,7 @@ namespace MetricsAgent.Controllers
         [HttpGet("errors-count/from/{fromTime}/to/{toTime}")]
         public IActionResult GetErrorsCount([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
         {
-            var metrics = _dotnetMetricsRepository.GetAll();
+            var metrics = _dotnetMetricsRepository.GetByTimePeriod(fromTime, toTime);
             if (_logger != null)
                 _logger.LogDebug("Успешно вернули DotNet метрику: __");
             return Ok(metrics);

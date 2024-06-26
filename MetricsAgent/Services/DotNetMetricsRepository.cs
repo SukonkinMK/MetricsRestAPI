@@ -91,6 +91,30 @@ namespace MetricsAgent.Services
             }
         }
 
+        public IList<DotNetMetric> GetByTimePeriod(TimeSpan fromTime, TimeSpan toTime)
+        {
+            using var connection = new SQLiteConnection(ConnectionString);
+            connection.Open();
+            using var cmd = new SQLiteCommand(connection);
+            cmd.CommandText = "SELECT * FROM dotnetmetrics WHERE time >= @timeFrom and time <= @timeTo";
+            cmd.Parameters.AddWithValue("@timeFrom", fromTime.TotalSeconds);
+            cmd.Parameters.AddWithValue("@timeTo", toTime.TotalSeconds);
+            var returnList = new List<DotNetMetric>();
+            using (SQLiteDataReader reader = cmd.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    returnList.Add(new DotNetMetric
+                    {
+                        Id = reader.GetInt32(0),
+                        Value = reader.GetInt32(1),
+                        Time = TimeSpan.FromSeconds(reader.GetInt32(2))
+                    });
+                }
+            }
+            return returnList;
+        }
+
         public void Update(DotNetMetric item)
         {
             using var connection = new SQLiteConnection(ConnectionString);

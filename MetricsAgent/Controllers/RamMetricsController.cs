@@ -19,7 +19,7 @@ namespace MetricsAgent.Controllers
         [HttpGet("available/from/{fromTime}/to/{toTime}")]
         public IActionResult GetMetrics([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
         {
-            var metrics = _ramMetricsRepository.GetAll();
+            var metrics = _ramMetricsRepository.GetByTimePeriod(fromTime, toTime);
             if (_logger != null)
                 _logger.LogDebug($"Успешно вернули метрику RAM с: {fromTime} по: {toTime}");
             return Ok(metrics);

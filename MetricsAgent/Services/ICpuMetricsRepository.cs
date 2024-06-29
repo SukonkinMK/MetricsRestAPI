@@ -2,7 +2,7 @@
 
 namespace MetricsAgent.Services
 {
-    public interface ICpuMetricsRepository : IRepository<CpuMetric>
+    public interface ICpuMetricsRepository : IRepository<CpuMetricDto>
     {
     }
 }

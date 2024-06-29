@@ -1,10 +1,10 @@
 using MetricsAgent.Converters;
+using MetricsAgent.Profiles;
 using MetricsAgent.Services;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using NLog.Extensions.Logging;
 using NLog.Web;
-using System.Data.SQLite;
 
 namespace MetricsAgent
 {
@@ -21,11 +21,12 @@ namespace MetricsAgent
                 builder.Logging.SetMinimumLevel(LogLevel.Trace);
                 builder.Logging.AddNLog(new NLogAspNetCoreOptions() { RemoveLoggerFactoryFilter = true });
                 // Add services to the container.
-                ConfigureSqlLiteConnection(builder.Services);
                 builder.Services.AddControllers()
                     .AddJsonOptions(options =>
                     options.JsonSerializerOptions.Converters.Add(new CustomTimeSpanConverter())); ;
 
+                builder.Services.AddDbContext<MetricsContext>();
+                builder.Services.AddAutoMapper(typeof(MapperProfile));
                 builder.Services.AddScoped<ICpuMetricsRepository, CpuMetricsRepository>();
                 builder.Services.AddScoped<IDotNetMetricsRepository, DotNetMetricsRepository>();
                 builder.Services.AddScoped<IHddMetricsRepository, HddMetricsRepository>();
@@ -71,34 +72,6 @@ namespace MetricsAgent
                 // Завершение работы логера
                 NLog.LogManager.Shutdown();
             }
-        }
-        private static void ConfigureSqlLiteConnection(IServiceCollection services)
-        {
-            const string connectionString = "Data Source = metrics.db; Version = 3; Pooling = true; Max Pool Size = 100;";
-            var connection = new SQLiteConnection(connectionString);
-            connection.Open();
-            PrepareSchema(connection);
-        }
-
-        private static void PrepareSchema(SQLiteConnection connection)
-        {
-            using (var command = new SQLiteCommand(connection))
-            {
-                // Задаём новый текст команды для выполнения
-                // Удаляем таблицу с метриками, если она есть в базе данных
-                DropAndCreateTable("cpumetrics", command);
-                DropAndCreateTable("dotnetmetrics", command);
-                DropAndCreateTable("hddmetrics", command);
-                DropAndCreateTable("networkmetrics", command);
-                DropAndCreateTable("rammetrics", command);
-            }
-        }
-        private static void DropAndCreateTable(string tableName, SQLiteCommand command)
-        {
-            command.CommandText = $"DROP TABLE IF EXISTS {tableName}";
-            command.ExecuteNonQuery();
-            command.CommandText = $"CREATE TABLE {tableName}(id INTEGER PRIMARY KEY, value INT, time INT)";
-            command.ExecuteNonQuery();
-        }
+        }        
     }
 }

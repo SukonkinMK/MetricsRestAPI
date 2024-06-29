@@ -2,7 +2,7 @@
 
 namespace MetricsAgent.Services
 {
-    public interface IHddMetricsRepository : IRepository<HddMetric>
+    public interface IHddMetricsRepository : IRepository<HddMetricDto>
     {
     }
 }

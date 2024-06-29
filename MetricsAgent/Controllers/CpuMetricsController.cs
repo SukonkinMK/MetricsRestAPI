@@ -2,7 +2,6 @@
 using MetricsAgent.Models;
 using MetricsAgent.Services;
 using Microsoft.AspNetCore.Mvc;
-using System.Data.SQLite;
 using Microsoft.Extensions.Logging;
 
 namespace MetricsAgent.Controllers
@@ -27,18 +26,40 @@ namespace MetricsAgent.Controllers
         [HttpPost("create")]
         public IActionResult Create([FromBody] CpuMetricCreateRequest request)
         {
-            CpuMetric cpuMetric = new CpuMetric
+            CpuMetricDto cpuMetric = new CpuMetricDto
             {
                 Time = request.Time,
                 Value = request.Value
             };
 
-            _cpuMetricsRepository.Create(cpuMetric);
+            int result = _cpuMetricsRepository.Create(cpuMetric);
 
             if (_logger != null)
                 _logger.LogDebug("Успешно добавили новую cpu метрику: {0}", cpuMetric);
 
-            return Ok();
+            return Ok(result);
+        }
+
+        [HttpDelete("delete")]
+        public IActionResult Delete([FromQuery] int id)
+        {
+            int result = _cpuMetricsRepository.Delete(id);
+
+            if (_logger != null)
+                _logger.LogDebug("Успешно добавили новую cpu метрику: {0}", id);
+
+            return Ok(result);
+        }
+
+        [HttpPatch("update")]
+        public IActionResult Update([FromBody] CpuMetricDto cpuMetric)
+        {
+            int result = _cpuMetricsRepository.Update(cpuMetric);
+
+            if (_logger != null)
+                _logger.LogDebug("Успешно обновили cpu метрику: {0}", cpuMetric);
+
+            return Ok(result);
         }
 
         [HttpGet("all")]
@@ -51,12 +72,7 @@ namespace MetricsAgent.Controllers
             };
             foreach (var metric in metrics)
             {
-                response.Metrics.Add(new CpuMetricDto
-                {
-                    Time = metric.Time,
-                    Value = metric.Value,
-                    Id = metric.Id
-                });
+                response.Metrics.Add(metric);
             }
 
             if (_logger != null)
@@ -65,26 +81,28 @@ namespace MetricsAgent.Controllers
             return Ok(response);
         }
 
-
-        [HttpGet("sql-test")]
-        public IActionResult TryToSqlLite()
+        [HttpGet("byid")]
+        public IActionResult GetMetricById([FromQuery] int id)
         {
-            string cs = "Data Source=:memory:";
-            string stm = "SELECT SQLITE_VERSION()";
-            using (var con = new SQLiteConnection(cs))
+            var metric = _cpuMetricsRepository.GetById(id);
+            var response = new AllCpuMetricsResponse()
             {
-                con.Open();
-                using var cmd = new SQLiteCommand(stm, con);
-                string version = cmd.ExecuteScalar().ToString();
-                return Ok(version);
-
+                Metrics = new List<CpuMetricDto>()
+            };
+            if (metric != null)
+            {
+                response.Metrics.Add(metric);
             }
+
+            if (_logger != null)
+                _logger.LogDebug("Успешно вернули метрику: {0}", id);
+
+            return Ok(response);
         }
 
         [HttpGet("from/{fromTime}/to/{toTime}")]
         public IActionResult GetMetrics([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)
         {
-
             if (_logger != null)
                 _logger.LogDebug($"Успешно вернули метрику с: {fromTime} по: {toTime}");
             return Ok(_cpuMetricsRepository.GetByTimePeriod(fromTime, toTime));

@@ -1,130 +1,88 @@
-﻿using MetricsAgent.Models;
-using System.Data.SQLite;
+﻿using AutoMapper;
+using MetricsAgent.Models;
 
 namespace MetricsAgent.Services
 {
     public class RamMetricsRepository : IRamMetricsRepository
     {
-        private const string ConnectionString = "Data Source=metrics.db;Version=3;Pooling=true;Max Pool Size=100;";
-        public void Create(RamMetric item)
+        private readonly MetricsContext _context;
+        private readonly IMapper _mapper;
+
+        public RamMetricsRepository(MetricsContext context, IMapper mapper)
         {
-            using var connection = new SQLiteConnection(ConnectionString);
-            connection.Open();
-            // Создаём команду
-            using var cmd = new SQLiteCommand(connection);
-            // Прописываем в команду SQL-запрос на вставку данных
-            cmd.CommandText = "INSERT INTO rammetrics(value, time) VALUES(@value, @time)";
-            // Добавляем параметры в запрос из нашего объекта
-            cmd.Parameters.AddWithValue("@value", item.Value);
-            // В таблице будем хранить время в секундах, поэтому преобразуем перед записью в секунды
-            // через свойство
-            cmd.Parameters.AddWithValue("@time", item.Time.TotalSeconds);
-            // подготовка команды к выполнению
-            cmd.Prepare();
-            // Выполнение команды
-            cmd.ExecuteNonQuery();
+            _context = context;
+            _mapper = mapper;
         }
 
-        public void Delete(int id)
+        public int Create(RamMetricDto item)
         {
-            using var connection = new SQLiteConnection(ConnectionString);
-            connection.Open();
-            using var cmd = new SQLiteCommand(connection);
-            // Прописываем в команду SQL-запрос на удаление данных
-            cmd.CommandText = "DELETE FROM rammetrics WHERE id=@id";
-            cmd.Parameters.AddWithValue("@id", id);
-            cmd.Prepare();
-            cmd.ExecuteNonQuery();
-        }
-
-        public IList<RamMetric> GetAll()
-        {
-            using var connection = new SQLiteConnection(ConnectionString);
-            connection.Open();
-            using var cmd = new SQLiteCommand(connection);
-            // Прописываем в команду SQL-запрос на получение всех данных из таблицы
-            cmd.CommandText = "SELECT * FROM rammetrics";
-            var returnList = new List<RamMetric>();
-            using (SQLiteDataReader reader = cmd.ExecuteReader())
+            using (_context)
             {
-                // Пока есть что читать — читаем
-                while (reader.Read())
-                {
-                    // Добавляем объект в список возврата
-                    returnList.Add(new RamMetric
-                    {
-                        Id = reader.GetInt32(0),
-                        Value = reader.GetInt32(1),
-                        // Налету преобразуем прочитанные секунды в метку времени
-                        Time = TimeSpan.FromSeconds(reader.GetInt32(2))
-                    });
-                }
-            }
-            return returnList;
-        }
-
-        public RamMetric GetById(int id)
-        {
-            using var connection = new SQLiteConnection(ConnectionString);
-            connection.Open();
-            using var cmd = new SQLiteCommand(connection);
-            cmd.CommandText = "SELECT * FROM rammetrics WHERE id=@id";
-            using (SQLiteDataReader reader = cmd.ExecuteReader())
-            {
-                // Если удалось что-то прочитать
-                if (reader.Read())
-                {
-                    // возвращаем прочитанное
-                    return new RamMetric
-                    {
-                        Id = reader.GetInt32(0),
-                        Value = reader.GetInt32(1),
-                        Time = TimeSpan.FromSeconds(reader.GetInt32(2))
-                    };
-                }
-                else
-                {
-                    // Не нашлась запись по идентификатору, не делаем ничего
-                    return null;
-                }
+                var entity = _mapper.Map<RamMetric>(item);
+                _context.RamMetrics.Add(entity);
+                _context.SaveChanges();
+                return entity.Id;
             }
         }
 
-        public IList<RamMetric> GetByTimePeriod(TimeSpan fromTime, TimeSpan toTime)
+        public int Delete(int id)
         {
-            using var connection = new SQLiteConnection(ConnectionString);
-            connection.Open();
-            using var cmd = new SQLiteCommand(connection);
-            cmd.CommandText = "SELECT * FROM rammetrics WHERE time >= @timeFrom and time <= @timeTo";
-            cmd.Parameters.AddWithValue("@timeFrom", fromTime.TotalSeconds);
-            cmd.Parameters.AddWithValue("@timeTo", toTime.TotalSeconds);
-            var returnList = new List<RamMetric>();
-            using (SQLiteDataReader reader = cmd.ExecuteReader())
+            using (_context)
             {
-                while (reader.Read())
+                var entity = _context.RamMetrics.FirstOrDefault(x => x.Id.Equals(id));
+                if (entity != null)
                 {
-                    returnList.Add(new RamMetric
-                    {
-                        Id = reader.GetInt32(0),
-                        Value = reader.GetInt32(1),
-                        Time = TimeSpan.FromSeconds(reader.GetInt32(2))
-                    });
+                    _context.RamMetrics.Remove(entity);
+                    _context.SaveChanges();
+                    return entity.Id;
                 }
+                return 0;
             }
-            return returnList;
         }
 
-        public void Update(RamMetric item)
+        public int Update(RamMetricDto item)
         {
-            using var connection = new SQLiteConnection(ConnectionString);
-            using var cmd = new SQLiteCommand(connection);
-            // Прописываем в команду SQL-запрос на обновление данных
-            cmd.CommandText = "UPDATE rammetrics SET value = @value, time = @time WHERE id = @id; ";
-            cmd.Parameters.AddWithValue("@id", item.Id);
-            cmd.Parameters.AddWithValue("@value", item.Value);
-            cmd.Parameters.AddWithValue("@time", item.Time.TotalSeconds);
-            cmd.Prepare();
-            cmd.ExecuteNonQuery();
+            using (_context)
+            {
+                var entity = _context.RamMetrics.FirstOrDefault(x => x.Id == item.Id);
+                if (entity != null)
+                {
+                    entity.Update(_mapper.Map<RamMetric>(item));
+                    _context.SaveChanges();
+                    return entity.Id;
+                }
+                return 0;
+            }
+        }
+
+        public IList<RamMetricDto> GetAll()
+        {
+            using (_context)
+            {
+                var returnList = _context.RamMetrics.Select(x => _mapper.Map<RamMetricDto>(x)).ToList();
+                return returnList;
+            }
+        }
+        public RamMetricDto GetById(int id)
+        {
+            using (_context)
+            {
+                var entity = _context.RamMetrics.FirstOrDefault(x => x.Id.Equals(id));
+                if (entity != null)
+                {
+                    return _mapper.Map<RamMetricDto>(entity);
+                }
+                return null;
+            }
+        }
+
+        public IList<RamMetricDto> GetByTimePeriod(TimeSpan fromTime, TimeSpan toTime)
+        {
+            using (_context)
+            {
+                var list = _context.RamMetrics.Where(x => x.Time > fromTime.TotalSeconds && x.Time < toTime.TotalSeconds).ToList();
+                return list.Select(x => _mapper.Map<RamMetricDto>(x)).ToList();
+            }
         }
     }
 }

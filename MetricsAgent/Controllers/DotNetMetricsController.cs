@@ -1,4 +1,5 @@
 ﻿using MetricsAgent.Models;
+using MetricsAgent.Models.Requests;
 using MetricsAgent.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,6 +15,18 @@ namespace MetricsAgent.Controllers
         {
             _logger = logger;
             _dotnetMetricsRepository = repository;
+        }
+
+        [HttpPost("create")]
+        public IActionResult Create([FromBody] DotNetMetricDto metric)
+        {
+
+            int result = _dotnetMetricsRepository.Create(metric);
+
+            if (_logger != null)
+                _logger.LogDebug("Успешно добавили новую cpu метрику: {0}", result);
+
+            return Ok(result);
         }
 
         [HttpGet("errors-count/from/{fromTime}/to/{toTime}")]

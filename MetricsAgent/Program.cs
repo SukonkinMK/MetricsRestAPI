@@ -1,10 +1,15 @@
 using MetricsAgent.Converters;
+using MetricsAgent.Jobs;
 using MetricsAgent.Profiles;
 using MetricsAgent.Services;
+using Microsoft.Identity.Client;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using NLog.Extensions.Logging;
 using NLog.Web;
+using Quartz;
+using Quartz.Impl;
+using Quartz.Spi;
 
 namespace MetricsAgent
 {
@@ -18,20 +23,27 @@ namespace MetricsAgent
             {
                 var builder = WebApplication.CreateBuilder(args);
                 builder.Logging.ClearProviders();
-                builder.Logging.SetMinimumLevel(LogLevel.Trace);
+                builder.Logging.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
                 builder.Logging.AddNLog(new NLogAspNetCoreOptions() { RemoveLoggerFactoryFilter = true });
                 // Add services to the container.
                 builder.Services.AddControllers()
                     .AddJsonOptions(options =>
                     options.JsonSerializerOptions.Converters.Add(new CustomTimeSpanConverter())); ;
+                
+                //добавляем Кварц
+                builder.Services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
+                builder.Services.AddSingleton<IJobFactory, MetricsJobFactory>();
+                builder.Services.AddSingleton<CpuMetricJob>();
+                builder.Services.AddSingleton(new JobSchedule(typeof(CpuMetricJob), "0/5 * * * * ?"));
+                builder.Services.AddHostedService<QuartzHostedService>();
 
-                builder.Services.AddDbContext<MetricsContext>();
+                builder.Services.AddDbContext<MetricsContext>(ServiceLifetime.Singleton);
                 builder.Services.AddAutoMapper(typeof(MapperProfile));
-                builder.Services.AddScoped<ICpuMetricsRepository, CpuMetricsRepository>();
-                builder.Services.AddScoped<IDotNetMetricsRepository, DotNetMetricsRepository>();
-                builder.Services.AddScoped<IHddMetricsRepository, HddMetricsRepository>();
-                builder.Services.AddScoped<INetworkMetricsRepository, NetworkMetricsRepository>();
-                builder.Services.AddScoped<IRamMetricsRepository, RamMetricsRepository>();
+                builder.Services.AddSingleton<ICpuMetricsRepository, CpuMetricsRepository>();
+                builder.Services.AddSingleton<IDotNetMetricsRepository, DotNetMetricsRepository>();
+                builder.Services.AddSingleton<IHddMetricsRepository, HddMetricsRepository>();
+                builder.Services.AddSingleton<INetworkMetricsRepository, NetworkMetricsRepository>();
+                builder.Services.AddSingleton<IRamMetricsRepository, RamMetricsRepository>();
                 builder.Services.AddEndpointsApiExplorer();
                 builder.Services.AddSwaggerGen(c =>
                 {

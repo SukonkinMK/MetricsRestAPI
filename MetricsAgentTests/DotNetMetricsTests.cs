@@ -27,7 +27,7 @@ namespace MetricsAgentTests
         [Fact]
         public void Get_ShouldCall_Get_From_Repository()
         {
-            repositoryMock.Setup(repositoryMock => repositoryMock.GetByTimePeriod(It.IsAny<TimeSpan>(), It.IsAny<TimeSpan>())).Returns(new List<DotNetMetric>() { new DotNetMetric()});
+            repositoryMock.Setup(repositoryMock => repositoryMock.GetByTimePeriod(It.IsAny<TimeSpan>(), It.IsAny<TimeSpan>())).Returns(new List<DotNetMetricDto>() { new DotNetMetricDto()});
 
             var result = _dotNetMetricsController.GetErrorsCount(TimeSpan.FromSeconds(0), TimeSpan.FromSeconds(10)) as OkObjectResult;
 

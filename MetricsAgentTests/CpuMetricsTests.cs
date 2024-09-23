@@ -32,7 +32,7 @@ namespace MetricsAgentTests
         {
             // Устанавливаем параметр заглушки
             // В заглушке прописываем, что в репозиторий прилетит CpuMetric - объект
-            repositoryMock.Setup(repository => repository.Create(It.IsAny<CpuMetric>())).Verifiable();
+            repositoryMock.Setup(repository => repository.Create(It.IsAny<CpuMetricDto>())).Verifiable();
             // Выполняем действие на контроллере
             var result = _cpuMetricsController.Create(new MetricsAgent.Models.Requests.CpuMetricCreateRequest
             {
@@ -41,7 +41,7 @@ namespace MetricsAgentTests
             });
             // Проверяем заглушку на то, что пока работал контроллер
             // Вызвался метод Create репозитория с нужным типом объекта в параметре
-            repositoryMock.Verify(repository => repository.Create(It.IsAny<CpuMetric>()), Times.AtMostOnce());
+            repositoryMock.Verify(repository => repository.Create(It.IsAny<CpuMetricDto>()), Times.AtMostOnce());
         }
 
         [Fact]

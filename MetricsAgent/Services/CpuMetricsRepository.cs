@@ -42,7 +42,7 @@ namespace MetricsAgent.Services
 
         public int Update(CpuMetricDto item)
         {
-            using(_context)
+            using (_context)
             {
                 var entity = _context.CpuMetrics.FirstOrDefault(x => x.Id == item.Id);
                 if (entity != null)

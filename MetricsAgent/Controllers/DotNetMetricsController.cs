@@ -17,17 +17,17 @@ namespace MetricsAgent.Controllers
             _dotnetMetricsRepository = repository;
         }
 
-        [HttpPost("create")]
-        public IActionResult Create([FromBody] DotNetMetricDto metric)
-        {
+        //[HttpPost("create")]
+        //public IActionResult Create([FromBody] DotNetMetricDto metric)
+        //{
 
-            int result = _dotnetMetricsRepository.Create(metric);
+        //    int result = _dotnetMetricsRepository.Create(metric);
 
-            if (_logger != null)
-                _logger.LogDebug("Успешно добавили новую cpu метрику: {0}", result);
+        //    if (_logger != null)
+        //        _logger.LogDebug("Успешно добавили новую cpu метрику: {0}", result);
 
-            return Ok(result);
-        }
+        //    return Ok(result);
+        //}
 
         [HttpGet("errors-count/from/{fromTime}/to/{toTime}")]
         public IActionResult GetErrorsCount([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)

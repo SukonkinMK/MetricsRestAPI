@@ -57,7 +57,8 @@ namespace MetricsAgent.Jobs
             .WithCronSchedule(schedule.CronExpression)
             .WithDescription(schedule.CronExpression)
             .Build();
-        }
+        }
+
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using MetricsAgent.Models;
+using MetricsAgent.Models.Requests;
 using MetricsAgent.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,15 +18,34 @@ namespace MetricsAgent.Controllers
             _ramMetricsRepository = ramMetricsRepository;
         }
 
-        [HttpPost("create")]
-        public IActionResult Create([FromBody] RamMetricDto metric)
+        //[HttpPost("create")]
+        //public IActionResult Create([FromBody] RamMetricDto metric)
+        //{
+        //    int result = _ramMetricsRepository.Create(metric);
+
+        //    if (_logger != null)
+        //        _logger.LogDebug("Успешно добавили новую cpu метрику: {0}", result);
+
+        //    return Ok(result);
+        //}
+
+        [HttpGet("all")]
+        public IActionResult GetAll()
         {
-            int result = _ramMetricsRepository.Create(metric);
+            var metrics = _ramMetricsRepository.GetAll();
+            var response = new AllRamMetricsResponse()
+            {
+                Metrics = new List<RamMetricDto>()
+            };
+            foreach (var metric in metrics)
+            {
+                response.Metrics.Add(metric);
+            }
 
             if (_logger != null)
-                _logger.LogDebug("Успешно добавили новую cpu метрику: {0}", result);
+                _logger.LogDebug("Успешно вернули метрик: {0}", response.Metrics.Count);
 
-            return Ok(result);
+            return Ok(response);
         }
 
         [HttpGet("available/from/{fromTime}/to/{toTime}")]

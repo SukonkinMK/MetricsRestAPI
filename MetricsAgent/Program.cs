@@ -29,21 +29,14 @@ namespace MetricsAgent
                 builder.Services.AddControllers()
                     .AddJsonOptions(options =>
                     options.JsonSerializerOptions.Converters.Add(new CustomTimeSpanConverter())); ;
-                
-                //добавляем Кварц
-                builder.Services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
-                builder.Services.AddSingleton<IJobFactory, MetricsJobFactory>();
-                builder.Services.AddSingleton<CpuMetricJob>();
-                builder.Services.AddSingleton(new JobSchedule(typeof(CpuMetricJob), "0/5 * * * * ?"));
-                builder.Services.AddHostedService<QuartzHostedService>();
 
-                builder.Services.AddDbContext<MetricsContext>(ServiceLifetime.Singleton);
+                builder.Services.AddDbContext<MetricsContext>(ServiceLifetime.Scoped);
                 builder.Services.AddAutoMapper(typeof(MapperProfile));
-                builder.Services.AddSingleton<ICpuMetricsRepository, CpuMetricsRepository>();
-                builder.Services.AddSingleton<IDotNetMetricsRepository, DotNetMetricsRepository>();
-                builder.Services.AddSingleton<IHddMetricsRepository, HddMetricsRepository>();
-                builder.Services.AddSingleton<INetworkMetricsRepository, NetworkMetricsRepository>();
-                builder.Services.AddSingleton<IRamMetricsRepository, RamMetricsRepository>();
+                builder.Services.AddScoped<ICpuMetricsRepository, CpuMetricsRepository>();
+                builder.Services.AddScoped<IDotNetMetricsRepository, DotNetMetricsRepository>();
+                builder.Services.AddScoped<IHddMetricsRepository, HddMetricsRepository>();
+                builder.Services.AddScoped<INetworkMetricsRepository, NetworkMetricsRepository>();
+                builder.Services.AddScoped<IRamMetricsRepository, RamMetricsRepository>();
                 builder.Services.AddEndpointsApiExplorer();
                 builder.Services.AddSwaggerGen(c =>
                 {
@@ -54,6 +47,19 @@ namespace MetricsAgent
                         Example = new OpenApiString("00:00:00")
                     });
                 });
+
+                //добавляем Кварц
+                builder.Services.AddSingleton<ISchedulerFactory, StdSchedulerFactory>();
+                builder.Services.AddSingleton<IJobFactory, MetricsJobFactory>();
+                builder.Services.AddSingleton<CpuMetricJob>();
+                builder.Services.AddSingleton<RamMetricJob>();
+                builder.Services.AddSingleton<HddMetircJob>();
+                builder.Services.AddSingleton<NetworkMetricJob>();
+                builder.Services.AddSingleton(new JobSchedule(typeof(CpuMetricJob), "0/5 * * * * ?"));
+                builder.Services.AddSingleton(new JobSchedule(typeof(RamMetricJob), "0/5 * * * * ?"));
+                builder.Services.AddSingleton(new JobSchedule(typeof(HddMetircJob), "0/5 * * * * ?"));
+                builder.Services.AddSingleton(new JobSchedule(typeof(NetworkMetricJob), "0/5 * * * * ?"));
+                builder.Services.AddHostedService<QuartzHostedService>();
 
                 var app = builder.Build();
 

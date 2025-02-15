@@ -17,16 +17,16 @@ namespace MetricsAgent.Controllers
             _networkMetricsRepository = networkMetricsRepository;
         }
 
-        [HttpPost("create")]
-        public IActionResult Create([FromBody] NetworkMetricDto metric)
-        {
-            int result = _networkMetricsRepository.Create(metric);
+        //[HttpPost("create")]
+        //public IActionResult Create([FromBody] NetworkMetricDto metric)
+        //{
+        //    int result = _networkMetricsRepository.Create(metric);
 
-            if (_logger != null)
-                _logger.LogDebug("Успешно добавили новую cpu метрику: {0}", result);
+        //    if (_logger != null)
+        //        _logger.LogDebug("Успешно добавили новую cpu метрику: {0}", result);
 
-            return Ok(result);
-        }
+        //    return Ok(result);
+        //}
 
         [HttpGet("from/{fromTime}/to/{toTime}")]
         public IActionResult GetMetrics([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)

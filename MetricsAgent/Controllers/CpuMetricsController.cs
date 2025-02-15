@@ -23,44 +23,44 @@ namespace MetricsAgent.Controllers
         }
 
 
-        [HttpPost("create")]
-        public IActionResult Create([FromBody] CpuMetricCreateRequest request)
-        {
-            CpuMetricDto cpuMetric = new CpuMetricDto
-            {
-                Time = request.Time,
-                Value = request.Value
-            };
+        //[HttpPost("create")]
+        //public IActionResult Create([FromBody] CpuMetricCreateRequest request)
+        //{
+        //    CpuMetricDto cpuMetric = new CpuMetricDto
+        //    {
+        //        Time = request.Time,
+        //        Value = request.Value
+        //    };
 
-            int result = _cpuMetricsRepository.Create(cpuMetric);
+        //    int result = _cpuMetricsRepository.Create(cpuMetric);
 
-            if (_logger != null)
-                _logger.LogDebug("Успешно добавили новую cpu метрику: {0}", cpuMetric);
+        //    if (_logger != null)
+        //        _logger.LogDebug("Успешно добавили новую cpu метрику: {0}", cpuMetric);
 
-            return Ok(result);
-        }
+        //    return Ok(result);
+        //}
 
-        [HttpDelete("delete")]
-        public IActionResult Delete([FromQuery] int id)
-        {
-            int result = _cpuMetricsRepository.Delete(id);
+        //[HttpDelete("delete")]
+        //public IActionResult Delete([FromQuery] int id)
+        //{
+        //    int result = _cpuMetricsRepository.Delete(id);
 
-            if (_logger != null)
-                _logger.LogDebug("Успешно добавили новую cpu метрику: {0}", id);
+        //    if (_logger != null)
+        //        _logger.LogDebug("Успешно добавили новую cpu метрику: {0}", id);
 
-            return Ok(result);
-        }
+        //    return Ok(result);
+        //}
 
-        [HttpPatch("update")]
-        public IActionResult Update([FromBody] CpuMetricDto cpuMetric)
-        {
-            int result = _cpuMetricsRepository.Update(cpuMetric);
+        //[HttpPatch("update")]
+        //public IActionResult Update([FromBody] CpuMetricDto cpuMetric)
+        //{
+        //    int result = _cpuMetricsRepository.Update(cpuMetric);
 
-            if (_logger != null)
-                _logger.LogDebug("Успешно обновили cpu метрику: {0}", cpuMetric);
+        //    if (_logger != null)
+        //        _logger.LogDebug("Успешно обновили cpu метрику: {0}", cpuMetric);
 
-            return Ok(result);
-        }
+        //    return Ok(result);
+        //}
 
         [HttpGet("all")]
         public IActionResult GetAll()
@@ -81,24 +81,24 @@ namespace MetricsAgent.Controllers
             return Ok(response);
         }
 
-        [HttpGet("byid")]
-        public IActionResult GetMetricById([FromQuery] int id)
-        {
-            var metric = _cpuMetricsRepository.GetById(id);
-            var response = new AllCpuMetricsResponse()
-            {
-                Metrics = new List<CpuMetricDto>()
-            };
-            if (metric != null)
-            {
-                response.Metrics.Add(metric);
-            }
+        //[HttpGet("byid")]
+        //public IActionResult GetMetricById([FromQuery] int id)
+        //{
+        //    var metric = _cpuMetricsRepository.GetById(id);
+        //    var response = new AllCpuMetricsResponse()
+        //    {
+        //        Metrics = new List<CpuMetricDto>()
+        //    };
+        //    if (metric != null)
+        //    {
+        //        response.Metrics.Add(metric);
+        //    }
 
-            if (_logger != null)
-                _logger.LogDebug("Успешно вернули метрику: {0}", id);
+        //    if (_logger != null)
+        //        _logger.LogDebug("Успешно вернули метрику: {0}", id);
 
-            return Ok(response);
-        }
+        //    return Ok(response);
+        //}
 
         [HttpGet("from/{fromTime}/to/{toTime}")]
         public IActionResult GetMetrics([FromRoute] TimeSpan fromTime, [FromRoute] TimeSpan toTime)

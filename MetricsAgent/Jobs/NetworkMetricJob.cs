@@ -1,4 +1,4 @@
-﻿using MetricsAgent.Models;
+﻿using MetricsData;
 using MetricsAgent.Services;
 using Quartz;
 using System.Diagnostics;

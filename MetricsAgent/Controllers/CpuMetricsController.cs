@@ -1,8 +1,7 @@
-﻿using MetricsAgent.Models.Requests;
-using MetricsAgent.Models;
+﻿using MetricsData.Requests;
 using MetricsAgent.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
+using MetricsData;
 
 namespace MetricsAgent.Controllers
 {
@@ -66,7 +65,7 @@ namespace MetricsAgent.Controllers
         public IActionResult GetAll()
         {
             var metrics = _cpuMetricsRepository.GetAll();
-            var response = new AllCpuMetricsResponse()
+            var response = new CpuMetricsResponse()
             {
                 Metrics = new List<CpuMetricDto>()
             };

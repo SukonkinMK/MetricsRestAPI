@@ -1,4 +1,6 @@
 using MetricsManager.Models;
+using MetricsManager.Profiles;
+using MetricsManager.Services;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using NLog.Extensions.Logging;
@@ -15,8 +17,12 @@ try
     builder.Logging.ClearProviders();
     builder.Logging.SetMinimumLevel(LogLevel.Trace);
     builder.Logging.AddNLog(new NLogAspNetCoreOptions() { RemoveLoggerFactoryFilter = true });
-    builder.Services.AddSingleton<IAgentPool<AgentInfo>, AgentPool>();
+    //builder.Services.AddSingleton<IAgentPool<AgentInfo>, AgentPool>();
+    builder.Services.AddDbContext<AgetsContext>(ServiceLifetime.Scoped);
+    builder.Services.AddAutoMapper(typeof(MapperProfile));
+    builder.Services.AddScoped<IAgetInfoRepository, AgetInfoRepository>();
     builder.Services.AddControllers();
+    builder.Services.AddHttpClient();
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen(c =>

@@ -1,4 +1,4 @@
-﻿namespace MetricsAgent.Models
+﻿namespace MetricsData
 {
     public class CpuMetricDto
     {

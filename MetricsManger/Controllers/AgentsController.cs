@@ -1,4 +1,5 @@
 ﻿using MetricsManager.Models;
+using MetricsManager.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System.Reflection;
@@ -9,17 +10,17 @@ namespace MetricsManager.Controllers
     [ApiController]
     public class AgentsController : ControllerBase
     {
-        private IAgentPool<AgentInfo> _agentPool;
+        private IAgetInfoRepository _agentPool;
         private readonly ILogger<AgentsController> _logger;
 
-        public AgentsController(IAgentPool<AgentInfo> agentPool, ILogger<AgentsController> logger)
+        public AgentsController(IAgetInfoRepository agentPool, ILogger<AgentsController> logger)
         {
             _agentPool = agentPool;
             _logger = logger;
         }
 
         [HttpPost("register")]
-        public IActionResult RegisterAgent([FromBody] AgentInfo agentInfo)
+        public IActionResult RegisterAgent([FromBody] AgentInfoDto agentInfo)
         {
             if (agentInfo != null)
             {
@@ -33,44 +34,49 @@ namespace MetricsManager.Controllers
         [HttpPut("enable/{agentId}")]
         public IActionResult EnableAgentById([FromRoute] int agentId)
         {
-            if (_agentPool.Values.ContainsKey(agentId))
+            AgentInfoDto agentInfo = new AgentInfoDto() { AgentId = agentId, Enable = true };
+            int res = _agentPool.Update(agentInfo);
+            if (res != -1)
             {
-                _agentPool.Values[agentId].Enable = true;
                 if (_logger != null)
                     _logger.LogDebug($"Успешно изменили статус агента id: {agentId}");
+                return Ok(res);
             }
             else
             {
                 if (_logger != null)
                     _logger.LogDebug($"Агент id: {agentId} не найден");
+                return BadRequest($"Агент id: {agentId} не найден");
             }
-            return Ok();
         }
 
 
         [HttpPut("disable/{agentId}")]
         public IActionResult DisableAgentById([FromRoute] int agentId)
         {
-            if (_agentPool.Values.ContainsKey(agentId))
-            {
-                _agentPool.Values[agentId].Enable = false;
+            AgentInfoDto agentInfo = new AgentInfoDto() {AgentId = agentId, Enable = false };
+            int res = _agentPool.Update(agentInfo);
+            if (res != -1)
+            {                
                 if (_logger != null)
                     _logger.LogDebug($"Успешно изменили статус агента id: {agentId}");
+                return Ok(res);
             }
             else
             {
                 if (_logger != null)
                     _logger.LogDebug($"Агент id: {agentId} не найден");
-            }
-            return Ok();
+                return BadRequest($"Агент id: {agentId} не найден");
+            }            
         }
 
         [HttpGet("get")]
         public IActionResult GetAllAgents()
         {
+            var response = _agentPool.Get();
             if (_logger != null)
-                _logger.LogDebug($"Успешно получен список агентов из {_agentPool.Get().Length} шт.");
-            return Ok(_agentPool.Get());
+                _logger.LogDebug($"Успешно получен список агентов из {response.Count} шт.");
+            return Ok(response);
         }
 
     }

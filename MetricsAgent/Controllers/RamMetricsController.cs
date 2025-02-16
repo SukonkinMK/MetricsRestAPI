@@ -1,4 +1,4 @@
-﻿using MetricsAgent.Models;
+﻿using MetricsData;
 using MetricsAgent.Models.Requests;
 using MetricsAgent.Services;
 using Microsoft.AspNetCore.Mvc;

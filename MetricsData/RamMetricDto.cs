@@ -1,6 +1,6 @@
-﻿namespace MetricsAgent.Models
+﻿namespace MetricsData
 {
-    public class HddMetricDto
+    public class RamMetricDto
     {
         public int Value { get; set; }
         public TimeSpan Time { get; set; }

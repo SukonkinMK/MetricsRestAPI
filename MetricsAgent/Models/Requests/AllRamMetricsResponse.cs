@@ -1,4 +1,5 @@
-﻿namespace MetricsAgent.Models.Requests
+﻿using MetricsData;
+namespace MetricsAgent.Models.Requests
 {
     public class AllRamMetricsResponse
     {

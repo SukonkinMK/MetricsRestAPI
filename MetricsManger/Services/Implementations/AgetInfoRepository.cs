@@ -2,7 +2,7 @@
 using MetricsData;
 using MetricsManager.Models;
 
-namespace MetricsManager.Services
+namespace MetricsManager.Services.Implementations
 {
     public class AgetInfoRepository : IAgetInfoRepository
     {
@@ -20,7 +20,7 @@ namespace MetricsManager.Services
             using (_context)
             {
                 //AgentInfo entity = _mapper.Map<AgentInfo>(value);
-                AgentInfo entity = new AgentInfo() { AgentAddress = value.AgentAddress.ToString(), Enable = value.Enable};
+                AgentInfo entity = new AgentInfo() { AgentAddress = value.AgentAddress.ToString(), Enable = value.Enable };
                 _context.AgentInfos.Add(entity);
                 _context.SaveChanges();
                 return entity.AgentId;
@@ -40,7 +40,7 @@ namespace MetricsManager.Services
         {
             using (_context)
             {
-                var entity = _context.AgentInfos.FirstOrDefault(x =>  x.AgentId == value.AgentId);
+                var entity = _context.AgentInfos.FirstOrDefault(x => x.AgentId == value.AgentId);
                 if (entity != null)
                 {
                     entity.Enable = value.Enable;

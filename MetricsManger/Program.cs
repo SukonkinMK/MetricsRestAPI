@@ -1,10 +1,12 @@
 using MetricsManager.Models;
 using MetricsManager.Profiles;
 using MetricsManager.Services;
+using MetricsManager.Services.Implementations;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using NLog.Extensions.Logging;
 using NLog.Web;
+using Polly;
 using System.Reflection.Metadata;
 
 NLog.Logger logger = NLogBuilder.ConfigureNLog("nlog.config").GetCurrentClassLogger();
@@ -22,7 +24,14 @@ try
     builder.Services.AddAutoMapper(typeof(MapperProfile));
     builder.Services.AddScoped<IAgetInfoRepository, AgetInfoRepository>();
     builder.Services.AddControllers();
-    builder.Services.AddHttpClient();
+    builder.Services.AddHttpClient(); //iHttpClientFactory
+    builder.Services.AddHttpClient<IMetricsAgentClient, MetricsAgentClient>().
+        AddTransientHttpErrorPolicy( p => p.WaitAndRetryAsync(
+            retryCount:3, 
+            sleepDurationProvider: (attemptCount) => TimeSpan.FromMilliseconds(2000),
+            onRetry: (exeption,sleepDuration,atemptNumber,context) =>
+            {
+            }));
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen(c =>

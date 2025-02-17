@@ -2,6 +2,7 @@
 using MetricsAgent.Models.Requests;
 using MetricsAgent.Services;
 using Microsoft.AspNetCore.Mvc;
+using MetricsData.Requests;
 
 namespace MetricsAgent.Controllers
 {
@@ -33,7 +34,7 @@ namespace MetricsAgent.Controllers
         public IActionResult GetAll()
         {
             var metrics = _ramMetricsRepository.GetAll();
-            var response = new AllRamMetricsResponse()
+            var response = new MetricsResponse<RamMetricDto>()
             {
                 Metrics = new List<RamMetricDto>()
             };
